@@ -1,18 +1,13 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import BlogCard from "./BlogCard";
-import { fetchAllBlogs } from "../store/blogSlice";
-import {BASE_URL}  from "../utils/api.js";
+import { useBlog } from "../context/Blogcontext";
 
 const LatestBlog = () => {
-  const dispatch = useDispatch();
-  const { all: blogs, allStatus } = useSelector(
-    (state) => state.blogs
-  );
+  const { all: blogs, allStatus, fetchAllBlogs } = useBlog();
 
   useEffect(() => {
-    dispatch(fetchAllBlogs());
-  }, [dispatch]);
+    fetchAllBlogs();
+  }, [fetchAllBlogs]);
 
   return (
     <section className="bg-gray-50 py-16">
@@ -55,5 +50,3 @@ const LatestBlog = () => {
 };
 
 export default LatestBlog;
-
-

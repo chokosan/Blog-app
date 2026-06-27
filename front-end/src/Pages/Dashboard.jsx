@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { createBlog, deleteBlog, fetchUserBlogs } from "../store/blogSlice";
+import { useAuth } from "../context/Authcontext";
+import { useBlog } from "../context/Blogcontext";
 import { BLOG_CATEGORIES } from "../constants/categories";
 import { Editor } from "@tinymce/tinymce-react";
 
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const user = useSelector((state) => state.auth.user);
-  const { items: blogs, status, createStatus, deleteStatus, error } = useSelector(
-    (state) => state.blogs
-  );
+  const { user } = useAuth();
+  const {
+    items: blogs,
+    status,
+    createStatus,
+    deleteStatus,
+    error,
+    fetchUserBlogs,
+    createBlog,
+    deleteBlog,
+  } = useBlog();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -28,8 +34,8 @@ const Dashboard = () => {
       navigate("/login");
       return;
     }
-    dispatch(fetchUserBlogs());
-  }, [user, dispatch, navigate]);
+    fetchUserBlogs();
+  }, [user, navigate, fetchUserBlogs]);
 
   useEffect(() => {
     if (error) {
@@ -64,7 +70,7 @@ const Dashboard = () => {
     data.append("image", formData.image);
 
     try {
-      await dispatch(createBlog(data)).unwrap();
+      await createBlog(data);
       toast.success("Blog created");
       setFormData({
         title: "",
@@ -80,7 +86,7 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this blog?")) return;
     try {
-      await dispatch(deleteBlog(id)).unwrap();
+      await deleteBlog(id);
       toast.success("Blog deleted");
     } catch (err) {
       toast.error(err || "Failed to delete blog");

@@ -7,28 +7,16 @@ import blogRoutes from './Routes/blog.routes.js'
 import upload from './Middlewares/multer.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
-import cloudinary from 'cloudinary';
 
 dotenv.config();
-
-//cloudinary config
-if (
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET
-) {
-  cloudinary.v2.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-}
-
 
 const app = express()
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+app.set('trust proxy', 1);
 
 //middlewares
 app.use(express.json());
@@ -40,6 +28,8 @@ app.use(cors({
   ],
   credentials: true
 }));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 let isConnected = false;

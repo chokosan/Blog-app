@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
 import logo from '../assets/logo3.png'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from "react-redux"
-import { logout } from "../store/authSlice"
+import { useAuth } from "../context/Authcontext"
 
 const Navbar = () => {
-  const dispatch = useDispatch()
-  const user = useSelector((state) => state.auth.user)
+  const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -45,7 +43,7 @@ const Navbar = () => {
 
             {user ? (
               <button
-                onClick={() => dispatch(logout())}
+                onClick={() => logout()}
                 className="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600"
               >
                 Logout
@@ -135,7 +133,7 @@ const Navbar = () => {
           {user ? (
             <button
               onClick={() => {
-                dispatch(logout())
+                logout()
                 setMenuOpen(false)
               }}
               className="bg-red-500 text-white py-2 rounded mt-2"
@@ -158,5 +156,3 @@ const Navbar = () => {
 }
 
 export default Navbar
-
-

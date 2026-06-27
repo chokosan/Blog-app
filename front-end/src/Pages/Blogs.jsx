@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react'
 import BlogCard from '../Components/BlogCard'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchAllBlogs } from '../store/blogSlice'
-import  {BASE_URL}  from "../utils/api.js";
+import { useBlog } from '../context/Blogcontext'
 
 const Blogs = () => {
-  const dispatch = useDispatch()
-  const { all: blogs, allStatus } = useSelector((state) => state.blogs)
+  const { all: blogs, allStatus, fetchAllBlogs } = useBlog()
 
   useEffect(() => {
-    dispatch(fetchAllBlogs())
-  }, [dispatch])
+    fetchAllBlogs()
+  }, [fetchAllBlogs])
 
   return (
     <div className="bg-gray-50 min-h-screen">

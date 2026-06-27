@@ -10,7 +10,7 @@ Insight Hub is a full-stack blogging platform built with the MERN stack (MongoDB
 
 🔐 Secure password hashing
 
-🖼️ Image upload support (cloud-ready)
+🖼️ Image upload support
 
 📱 Fully responsive UI
 
@@ -29,7 +29,7 @@ React Router
 
 Axios
 
-CSS / Tailwind / Bootstrap (your choice)
+CSS / Tailwind 
 
 Backend
 

@@ -1,6 +1,11 @@
 import Blog from '../models/blog.model.js'
-import { getDataUri } from '../utils/features.js'
-import cloudinary from 'cloudinary'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadDir = path.join(__dirname, '../uploads');
 
 export const allblogs =async(req,res)=>{
     try {
@@ -17,28 +22,21 @@ export const allblogs =async(req,res)=>{
 export const createBlog = async (req, res) => {
     try {
         const { title, category, description } = req.body;
-        
-        // Check if a file exists
+
+
         if (!req.file) {
             return res.status(400).json({ message: "Image is required", success: false });
         }
 
-        // Convert file to Data URI
-        const imageFile = getDataUri(req.file);
+        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
-        //  Upload to Cloudinary and CAPTURE the result
-        const myCloud = await cloudinary.v2.uploader.upload(imageFile.content, {
-            folder: "blogs",
-        });
-
-        // the blog entry using Cloudinary's secure_url
         const blog = await Blog.create({
             title,
             category,
             description,
             image: {
-                public_id: myCloud.public_id, 
-                url: myCloud.secure_url,      
+                public_id: req.file.filename,
+                url: imageUrl,
             },
             author: {
                 id: req.user.id,
@@ -46,7 +44,7 @@ export const createBlog = async (req, res) => {
                 image: req.user.image.url
             }
         });
-       
+
 
         return res.status(201).json({
             message: 'Blog created successfully',
@@ -69,8 +67,14 @@ export const deleteBlog = async(req,res)=>{
             return res.status(403).json({message :'not authorized to delete this blog '})
         }
 
-        // Delete image from Cloudinary
-        await cloudinary.v2.uploader.destroy(blog.image.public_id);
+        if (blog.image?.public_id) {
+            const filePath = path.join(uploadDir, blog.image.public_id);
+            fs.unlink(filePath, (err) => {
+                if (err && err.code !== 'ENOENT') {
+                    console.error('Failed to delete image file:', err.message);
+                }
+            });
+        }
 
         await blog.deleteOne()
         return res.status(200).json({message :'blog deleted successfully', success: true})
@@ -91,13 +95,10 @@ export const singleblog = async(req,res)=>{
 
 export const userblogs = async(req,res)=>{
     try {
-        // Make sure you match the ID field name used in your JWT (req.user.id vs req.user._id)
+
         const blogs = await Blog.find({'author.id': req.user.id}).sort({createdAt : -1})
         res.status(200).json(blogs)
     } catch (error) {
          return res.status(500).json({message :'internal server error', success:false})
     }
 }
-
-
-

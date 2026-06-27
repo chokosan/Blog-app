@@ -1,8 +1,6 @@
 import User from '../models/user.model.js';
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import { getDataUri } from '../utils/features.js';
-import cloudinary from 'cloudinary';
 
 export const register = async (req, res) => {
     try {
@@ -18,21 +16,11 @@ export const register = async (req, res) => {
         let image = { public_id: "", url: "" };
 
         if (req.file) {
-            try {
-                const imageFile = getDataUri(req.file);
-                const myCloud = await cloudinary.v2.uploader.upload(imageFile.content, {
-                    folder: "users",
-                });
-                image = {
-                    public_id: myCloud.public_id,
-                    url: myCloud.secure_url,
-                };
-            } catch (uploadError) {
-                // Continue without image or return error
-                return res.status(500).json({ message: "Failed to upload image", success: false });
-            }
-        } else {
-            // Continue without image if not provided
+            const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            image = {
+                public_id: req.file.filename,
+                url: imageUrl,
+            };
         }
 
         const user = await User.create({
@@ -42,7 +30,7 @@ export const register = async (req, res) => {
             image
         });
 
-        
+
         const userResponse = { ...user._doc };
         delete userResponse.password;
 

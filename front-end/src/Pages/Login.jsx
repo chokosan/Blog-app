@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useDispatch, useSelector } from "react-redux"
-import { login } from "../store/authSlice"
+import { useAuth } from '../context/Authcontext'
 
 const Login = () => {
 
@@ -10,8 +9,7 @@ const Login = () => {
     email: "",
     password: ""
   })
-  const dispatch = useDispatch()
-  const authStatus = useSelector((state) => state.auth.status)
+  const { login, status: authStatus } = useAuth()
   const navigate = useNavigate()
 
   const onChangehandler = (e) => {
@@ -22,7 +20,7 @@ const Login = () => {
     e.preventDefault()
 
     try {
-      const result = await dispatch(login(formdata)).unwrap()
+      const result = await login(formdata)
       toast.success(result.message || "Logged in")
       navigate('/')
 

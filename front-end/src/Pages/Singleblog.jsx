@@ -1,20 +1,16 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchSingleBlog } from '../store/blogSlice'
-import {BASE_URL}  from "../utils/api.js";
-
+import { useBlog } from '../context/Blogcontext'
 
 const Singleblog = () => {
   const { id } = useParams()
-  const dispatch = useDispatch()
-  const { current: blog, currentStatus } = useSelector((state) => state.blogs)
+  const { current: blog, currentStatus, fetchSingleBlog } = useBlog()
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchSingleBlog(id))
+      fetchSingleBlog(id)
     }
-  }, [dispatch, id])
+  }, [id, fetchSingleBlog])
 
   if (currentStatus === 'loading' || !blog) {
     return (
@@ -59,4 +55,3 @@ const Singleblog = () => {
 }
 
 export default Singleblog
-

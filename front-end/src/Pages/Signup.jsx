@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { api } from "../utils/api"
-import { useDispatch } from "react-redux"
-import { login } from "../store/authSlice"
+import { useAuth } from '../context/Authcontext'
 
 const Signup = () => {
 
@@ -15,7 +14,7 @@ const Signup = () => {
   })
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const { login } = useAuth()
   const [loading, setloading] = useState(false)
 
   const onChangehandler = (e) => {
@@ -43,12 +42,12 @@ const Signup = () => {
       if (response.data.success) {
         toast.success(response.data.message)
         // backend register does not return token, so auto-login after signup
-        await dispatch(login({ email: formdata.email, password: formdata.password })).unwrap()
+        await login({ email: formdata.email, password: formdata.password })
         navigate('/')
       }
 
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message)
+      toast.error(error.response?.data?.message || error.message || error)
     } finally {
       setloading(false)
     }
